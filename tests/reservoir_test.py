@@ -1,10 +1,10 @@
-import contextlib
 import mock
 import testify as T
 
 from uwsgi_metrics.reservoir import Reservoir
 
 class ReservoirTest(T.TestCase):
+    """Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/test/java/com/codahale/metrics/ExponentiallyDecayingReservoirTest.java"""
 
     def assert_all_values_between(self, reservoir, low, high):
         for value in reservoir.snapshot().values:
@@ -50,7 +50,9 @@ class ReservoirTest(T.TestCase):
             def add_hours(self, hours):
                 self._time += 60 * 60 * hours
 
-        with mock.patch('time.time', Clock(42.0)) as clock:
+        with mock.patch('uwsgi_metrics.reservoir.Reservoir'
+                        + '.current_time_in_fractional_seconds',
+                        Clock(42.0)) as clock:
             reservoir = Reservoir(size=10, alpha=0.015)
 
             # Add 1000 values at a rate of 10 values/second

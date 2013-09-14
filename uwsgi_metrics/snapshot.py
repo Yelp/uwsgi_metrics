@@ -1,8 +1,16 @@
-class Snapshot(object):
-    """A snapshot of a reservoir state."""
+import math
 
-    def __init__(self, values):
-        self.values = values
+class Snapshot(object):
+    """A snapshot of a reservoir state.
+
+    Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/main/java/com/codahale/metrics/Snapshot.java
+    """
+
+    def __init__(self, values=None):
+        if values is None:
+            self.values = []
+        else:
+            self.values = sorted(values)
 
     def get_value(self, quantile):
         if quantile < 0.0 or quantile > 1.0:
@@ -11,13 +19,13 @@ class Snapshot(object):
         if len(self.values) == 0:
             return 0.0
 
-        pos = quantile * len(self.values) + 1
+        pos = quantile * (len(self.values) + 1)
 
         if pos < 1:
             return self.values[0]
 
         if pos >= len(self.values):
-            return self.values[len(self.values) - 1]
+            return self.values[-1]
 
         lower = self.values[int(pos) - 1]
         upper = self.values[int(pos)]
@@ -45,6 +53,32 @@ class Snapshot(object):
         if len(self.values) == 0:
             return 0.0
         return sum(self.values) / len(self.values)
+
+    def get_std_dev(self):
+        # Two-pass algorithm for variance, avoids numeric overflow
+
+        if len(self.values) <= 1:
+            return 0.0
+
+        mean = self.get_mean()
+        sum_ = 0
+
+        for value in self.values:
+            diff = value - mean
+            sum_ += diff * diff;
+
+        variance = sum_ / (len(self.values) - 1.0)
+        return math.sqrt(variance)
+
+    def get_min(self):
+        if len(self.values) == 0:
+            return 0.0
+        return self.values[0]
+
+    def get_max(self):
+        if len(self.values) == 0:
+            return 0.0
+        return self.values[-1]
 
     def size(self):
         return len(self.values)
