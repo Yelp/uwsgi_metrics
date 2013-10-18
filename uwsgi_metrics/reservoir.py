@@ -107,5 +107,5 @@ class Reservoir(object):
             new_values[new_key] = self.values[key]
         self.values = new_values
 
-    def snapshot(self):
+    def get_snapshot(self):
         return Snapshot(self.values.values())

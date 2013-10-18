@@ -8,7 +8,7 @@ class ReservoirTest(T.TestCase):
     """Translated from ExponentiallyDecayingReservoirTest.java"""
 
     def assert_all_values_between(self, reservoir, low, high):
-        for value in reservoir.snapshot().values:
+        for value in reservoir.get_snapshot().values:
             T.assert_gte(value, low)
             T.assert_lt(value, high)
 
@@ -17,7 +17,7 @@ class ReservoirTest(T.TestCase):
         for i in xrange(1000):
             reservoir.update(i)
 
-        T.assert_equal(reservoir.snapshot().size(), 100)
+        T.assert_equal(reservoir.get_snapshot().size(), 100)
         self.assert_all_values_between(reservoir, 0, 1000)
 
     def test_insert_10_elements_into_a_reservoir_of_100(self):
@@ -25,7 +25,7 @@ class ReservoirTest(T.TestCase):
         for i in xrange(10):
             reservoir.update(i)
 
-        T.assert_equal(reservoir.snapshot().size(), 10)
+        T.assert_equal(reservoir.get_snapshot().size(), 10)
         self.assert_all_values_between(reservoir, 0, 10)
 
     def test_insert_100_elemnts_into_a_heavily_baised_reservoir_of_1000(self):
@@ -33,7 +33,7 @@ class ReservoirTest(T.TestCase):
         for i in xrange(100):
             reservoir.update(i)
 
-        T.assert_equal(reservoir.snapshot().size(), 100)
+        T.assert_equal(reservoir.get_snapshot().size(), 100)
         self.assert_all_values_between(reservoir, 0, 100)
 
     def test_inactivity_should_not_corrupt_sampling_state(self):
@@ -61,7 +61,7 @@ class ReservoirTest(T.TestCase):
                 reservoir.update(1000 + i)
                 clock.add_millis(100)
 
-            T.assert_equal(reservoir.snapshot().size(), 10)
+            T.assert_equal(reservoir.get_snapshot().size(), 10)
             self.assert_all_values_between(reservoir, 1000, 2000)
 
             # Wait for 15 hours and add another value.  This should trigger a
@@ -70,5 +70,5 @@ class ReservoirTest(T.TestCase):
             # existing priorities equal to zero after rescale.
             clock.add_hours(15)
             reservoir.update(2000)
-            T.assert_equal(reservoir.snapshot().size(), 2)
+            T.assert_equal(reservoir.get_snapshot().size(), 2)
             self.assert_all_values_between(reservoir, 1000, 3000)
