@@ -1,9 +1,10 @@
-PYTHON=PYTHONPATH="$(shell pwd)" python
-TESTIFY=$(PYTHON) "$(shell which testify)"
-
-.PHONY: test
-
-tests: test
+.PHONY: test clean
 
 test:
-	$(TESTIFY) tests
+	tox
+
+clean:
+	find . -name '*.pyc' -delete
+	rm -rf uWSGI_Metrics.egg-info
+	rm -rf .tox
+	rm -f MANIFEST

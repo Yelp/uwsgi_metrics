@@ -4,8 +4,9 @@ from uwsgi_metrics.ewma import EWMA
 
 MAX_DIFFERENCE = 0.00000001
 
+
 class EWMATest(T.TestCase):
-    """Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/test/java/com/codahale/metrics/EWMATest.java"""
+    """Translated from EWMATest.java"""
 
     __test__ = False
 
@@ -23,8 +24,10 @@ class EWMATest(T.TestCase):
         self.ewma.update(3)
         self.ewma.tick()
         for rate in self.expected_rates:
-            self.assert_almost_equal(self.ewma.get_rate(), rate, MAX_DIFFERENCE)
+            self.assert_almost_equal(
+                self.ewma.get_rate(), rate, MAX_DIFFERENCE)
             self.elapse_minute(self.ewma)
+
 
 class OneMinuteEWMATest(EWMATest):
 
@@ -49,6 +52,7 @@ class OneMinuteEWMATest(EWMATest):
         0.00000018,
         ]
 
+
 class FiveMinuteEWMATest(EWMATest):
 
     ewma = EWMA.five_minute_EWMA()
@@ -71,6 +75,7 @@ class FiveMinuteEWMATest(EWMATest):
         0.03648604,
         0.02987224
         ]
+
 
 class FifteenMinuteEWMATest(EWMATest):
 

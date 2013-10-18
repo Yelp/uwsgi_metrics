@@ -3,8 +3,9 @@ import testify as T
 
 from uwsgi_metrics.reservoir import Reservoir
 
+
 class ReservoirTest(T.TestCase):
-    """Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/test/java/com/codahale/metrics/ExponentiallyDecayingReservoirTest.java"""
+    """Translated from ExponentiallyDecayingReservoirTest.java"""
 
     def assert_all_values_between(self, reservoir, low, high):
         for value in reservoir.snapshot().values:
@@ -35,7 +36,7 @@ class ReservoirTest(T.TestCase):
         T.assert_equal(reservoir.snapshot().size(), 100)
         self.assert_all_values_between(reservoir, 0, 100)
 
-    def test_long_periods_of_inactivity_should_not_corrupt_sampling_state(self):
+    def test_inactivity_should_not_corrupt_sampling_state(self):
 
         class Clock(object):
             def __init__(self, time):
@@ -67,7 +68,7 @@ class ReservoirTest(T.TestCase):
             # rescale. Note that the number of samples will be reduced to 2
             # because of the very small scaling factor that will make all
             # existing priorities equal to zero after rescale.
-            clock.add_hours(15);
-            reservoir.update(2000);
+            clock.add_hours(15)
+            reservoir.update(2000)
             T.assert_equal(reservoir.snapshot().size(), 2)
             self.assert_all_values_between(reservoir, 1000, 3000)

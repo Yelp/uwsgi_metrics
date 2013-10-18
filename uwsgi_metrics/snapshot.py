@@ -1,9 +1,10 @@
 import math
 
+
 class Snapshot(object):
     """A snapshot of a reservoir state.
 
-    Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/main/java/com/codahale/metrics/Snapshot.java
+    Translated from Snapshot.java
     """
 
     def __init__(self, values=None):
@@ -29,7 +30,7 @@ class Snapshot(object):
 
         lower = self.values[int(pos) - 1]
         upper = self.values[int(pos)]
-        return lower + (pos - math.floor(pos)) * (upper - lower);
+        return lower + (pos - math.floor(pos)) * (upper - lower)
 
     def get_median(self):
         return self.get_value(0.5)
@@ -65,7 +66,7 @@ class Snapshot(object):
 
         for value in self.values:
             diff = value - mean
-            sum_ += diff * diff;
+            sum_ += diff * diff
 
         variance = sum_ / (len(self.values) - 1.0)
         return math.sqrt(variance)

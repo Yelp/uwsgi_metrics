@@ -1,5 +1,6 @@
 from math import exp
 
+
 class EWMA(object):
     """An exponentially-weighted moving average.
 
@@ -10,7 +11,7 @@ class EWMA(object):
       http://www.teamquest.com/pdfs/whitepaper/ldavg2.pdf
     * http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average
 
-    Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/main/java/com/codahale/metrics/EWMA.java
+    Translated from EWMA.java
     """
 
     TICK_INTERVAL_S = 5
@@ -20,7 +21,8 @@ class EWMA(object):
     FIFTEEN_MINUTES = 15
     M1_ALPHA = 1 - exp(-TICK_INTERVAL_S / SECONDS_PER_MINUTE / ONE_MINUTE)
     M5_ALPHA = 1 - exp(-TICK_INTERVAL_S / SECONDS_PER_MINUTE / FIVE_MINUTES)
-    M15_ALPHA = 1 - exp(-TICK_INTERVAL_S / SECONDS_PER_MINUTE / FIFTEEN_MINUTES)
+    M15_ALPHA = 1 - exp(
+        -TICK_INTERVAL_S / SECONDS_PER_MINUTE / FIFTEEN_MINUTES)
 
     @classmethod
     def one_minute_EWMA(cls):

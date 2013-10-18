@@ -7,8 +7,9 @@ from uwsgi_metrics.snapshot import Snapshot
 # A small value
 EPSILON = 0.01
 
+
 class SnapshotTest(T.TestCase):
-    """Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/test/java/com/codahale/metrics/SnapshotTest.java"""
+    """Translated from SnapshotTest.java"""
 
     @T.setup
     def create_snapshot(self):
@@ -78,7 +79,11 @@ class SnapshotTest(T.TestCase):
         T.assert_equal(self.snapshot.get_value(0.0), 0)
         T.assert_equal(self.snapshot.get_value(1.0), 999)
         T.assert_equal(self.snapshot.get_median(), 499.5)
-        T.assert_within_tolerance(self.snapshot.get_75th_percentile(), 750, EPSILON)
-        T.assert_within_tolerance(self.snapshot.get_98th_percentile(), 980, EPSILON)
-        T.assert_within_tolerance(self.snapshot.get_99th_percentile(), 990, EPSILON)
-        T.assert_within_tolerance(self.snapshot.get_999th_percentile(), 999, EPSILON)
+        T.assert_within_tolerance(
+            self.snapshot.get_75th_percentile(), 750, EPSILON)
+        T.assert_within_tolerance(
+            self.snapshot.get_98th_percentile(), 980, EPSILON)
+        T.assert_within_tolerance(
+            self.snapshot.get_99th_percentile(), 990, EPSILON)
+        T.assert_within_tolerance(
+            self.snapshot.get_999th_percentile(), 999, EPSILON)

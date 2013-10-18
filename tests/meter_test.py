@@ -5,6 +5,7 @@ from uwsgi_metrics.meter import Meter
 
 MAX_DIFFERENCE = 0.001
 
+
 class Clock(object):
     def __init__(self, time):
         self._time = time
@@ -15,8 +16,9 @@ class Clock(object):
     def add_seconds(self, seconds):
         self._time += seconds
 
+
 class MeterTest(T.TestCase):
-    """Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/test/java/com/codahale/metrics/MeterTest.java"""
+    """Translated from MeterTest.java"""
 
     @T.setup_teardown
     def setup_mocks(self):

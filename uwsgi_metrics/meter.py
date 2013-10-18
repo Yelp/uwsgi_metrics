@@ -2,11 +2,12 @@ import time
 
 from ewma import EWMA
 
+
 class Meter(object):
     """A meter metric which measures mean throughput and one-, five-, and
     fifteen-minute exponentially-weighted moving average throughputs.
 
-    Translated from https://github.com/codahale/metrics/blob/master/metrics-core/src/main/java/com/codahale/metrics/Meter.java
+    Translated from Meter.java
     """
 
     def __init__(self):
