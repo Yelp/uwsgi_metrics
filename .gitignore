@@ -3,3 +3,4 @@ virtualenv_run
 .tox
 MANIFEST
 uWSGI_Metrics.egg-info
+.coverage
