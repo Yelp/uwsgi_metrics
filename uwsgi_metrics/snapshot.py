@@ -53,7 +53,7 @@ class Snapshot(object):
     def get_mean(self):
         if len(self.values) == 0:
             return 0.0
-        return sum(self.values) / len(self.values)
+        return sum(self.values) / float(len(self.values))
 
     def get_std_dev(self):
         # Two-pass algorithm for variance, avoids numeric overflow
@@ -83,3 +83,17 @@ class Snapshot(object):
 
     def size(self):
         return len(self.values)
+
+    def view(self):
+        return {
+            'min': self.get_min(),
+            'max': self.get_max(),
+            'mean': self.get_mean(),
+            'stddev': self.get_std_dev(),
+            'p50': self.get_median(),
+            'p75': self.get_75th_percentile(),
+            'p95': self.get_95th_percentile(),
+            'p98': self.get_98th_percentile(),
+            'p99': self.get_99th_percentile(),
+            'p99.9': self.get_999th_percentile(),
+            }

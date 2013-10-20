@@ -1,6 +1,8 @@
 import mock
 import testify as T
 
+from uwsgi_metrics.histogram import Histogram
+from uwsgi_metrics.meter import Meter
 from uwsgi_metrics.timer import Timer
 
 
@@ -9,8 +11,8 @@ class TimerTest(T.TestCase):
 
     @T.setup
     def setup_timer(self):
-        self.histogram = mock.Mock()
-        self.meter = mock.Mock()
+        self.histogram = mock.create_autospec(Histogram)
+        self.meter = mock.create_autospec(Meter)
         self.timer = Timer(meter=self.meter, histogram=self.histogram)
 
     def test_get_count(self):
@@ -40,8 +42,9 @@ class TimerTest(T.TestCase):
                        mock.sentinel.fifteen_minute_rate)
 
     def test_update_modifies_histogram_and_meter(self):
-        self.timer.update()
-        self.histogram.update.assert_called_once_with(1)
+        self.timer.update(mock.sentinel.timer_update_value)
+        self.histogram.update.assert_called_once_with(
+            mock.sentinel.timer_update_value)
         self.meter.mark.assert_called_once_with()
 
     def test_snapshot_is_returned(self):
@@ -51,4 +54,12 @@ class TimerTest(T.TestCase):
     def test_update_ignores_negative_values(self):
         self.timer.update(-1)
         T.assert_equal(self.histogram.update.called, False)
-        T.assert_equal(self.histogram.mark.called, False)
+        T.assert_equal(self.meter.mark.called, False)
+
+    def test_view(self):
+        self.histogram.view.return_value = mock.sentinel.histogram_view
+        self.meter.view.return_value = mock.sentinel.meter_view
+        T.assert_equal(self.timer.view(),
+                       {'duration': mock.sentinel.histogram_view,
+                        'throughput': mock.sentinel.meter_view
+                        })

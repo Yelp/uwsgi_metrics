@@ -57,3 +57,12 @@ class Meter(object):
         if elapsed == 0:
             return 0.0
         return self.count / elapsed
+
+    def view(self):
+        return {
+            'm1': self.get_one_minute_rate(),
+            'm5': self.get_five_minute_rate(),
+            'm15': self.get_fifteen_minute_rate(),
+            'mean': self.get_mean_rate(),
+            'count': self.get_count(),
+            }

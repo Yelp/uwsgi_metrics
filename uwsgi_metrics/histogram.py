@@ -1,4 +1,3 @@
-from uwsgi_metrics.counter import Counter
 from uwsgi_metrics.reservoir import Reservoir
 
 
@@ -9,15 +8,21 @@ class Histogram(object):
     """
 
     def __init__(self, counter=None, reservoir=None):
-        self.counter = counter or Counter()
+        self.count = 0
         self.reservoir = reservoir or Reservoir()
 
     def update(self, value):
-        self.counter.inc()
+        self.count += 1
         self.reservoir.update(value)
 
     def get_count(self):
-        return self.counter.get_count()
+        return self.count
 
     def get_snapshot(self):
         return self.reservoir.get_snapshot()
+
+    def view(self):
+        # Just mash the count in with everything else
+        result = self.get_snapshot().view()
+        result['count'] = self.count
+        return result

@@ -13,7 +13,13 @@ class Timer(object):
         self.meter = meter or Meter()
         self.histogram = histogram or Histogram()
 
-    def update(self, duration=1):
+    def view(self):
+        return {
+            'duration': self.histogram.view(),
+            'throughput': self.meter.view(),
+            }
+
+    def update(self, duration):
         """Add a recorded duration."""
         if duration >= 0:
             self.histogram.update(duration)

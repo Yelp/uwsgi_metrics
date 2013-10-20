@@ -87,3 +87,15 @@ class SnapshotTest(T.TestCase):
             self.snapshot.get_99th_percentile(), 990, EPSILON)
         T.assert_within_tolerance(
             self.snapshot.get_999th_percentile(), 999, EPSILON)
+
+    def test_view(self):
+        view = self.snapshot.view()
+        T.assert_equal(view['p50'], 3.0)
+        T.assert_equal(view['p75'], 4.5)
+        T.assert_equal(view['p98'], 5)
+        T.assert_equal(view['p99'], 5)
+        T.assert_equal(view['p99.9'], 5)
+        T.assert_equal(view['min'], 1)
+        T.assert_equal(view['max'], 5)
+        T.assert_equal(view['mean'], 3.0)
+        T.assert_within_tolerance(view['stddev'], 1.5811, 4)
