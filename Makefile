@@ -1,7 +1,10 @@
-.PHONY: test clean
+.PHONY: docs test clean
 
 test:
 	tox
+
+docs:
+	tox -e docs
 
 clean:
 	find . -name '*.pyc' -delete
