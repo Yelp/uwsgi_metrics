@@ -4,7 +4,6 @@ import contextlib
 import logging
 import marshal
 import mmap
-import os
 import time
 
 try:
@@ -53,45 +52,22 @@ MAX_MARSHALLED_VIEW_SIZE = 2**20
 
 log = logging.getLogger('uwsgi_metrics.metrics')
 
-# Dictionary of timer objects living in mule, periodically marshalled to
-# memory mapped file for viewing by regular workers.
+# Dictionaries of metrics objects living in mule, periodically marshalled to
+# memory mapped buffer for viewing by regular workers.
 timers = {}
 histograms = {}
 
-# The memory mapped file.
-marshalled_metrics_mmap = None
-
-# Have we been initialized yet?
-initialized = False
-
-
-def initialize():
-    """Setup uwsgi_metrics.  This function should be invoked pre-fork by the
-    uWSGI master process before any other uwsgi_metrics methods are invoked.
-    """
-    global marshalled_metrics_mmap, initialized
-
-    # First time that this has been run
-    assert not initialized
-    initialized = True
-
-    # Running in the master
-    assert uwsgi.masterpid() == os.getpid()
-
-    marshalled_metrics_mmap = mmap.mmap(
-        -1, MAX_MARSHALLED_VIEW_SIZE)
-    marshalled_metrics_mmap.write(
-        marshal.dumps({
-            'timers': {},
-            'histograms': {}
-            }))
+# The memory mapped buffer
+marshalled_metrics_mmap = mmap.mmap(-1, MAX_MARSHALLED_VIEW_SIZE)
+marshalled_metrics_mmap.write(
+    marshal.dumps({
+        'timers': {},
+        'histograms': {}
+        }))
 
 
 @uwsgidecorators.timer(PROCESSING_PERIOD_S, target='mule1')
-def periodically_write_metrics_to_mmaped_file(_):
-    if not initialized:
-        return
-
+def periodically_write_metrics_to_mmaped_buffer(_):
     view = {
         'timers': {},
         'histograms': {}
@@ -121,7 +97,6 @@ def periodically_write_metrics_to_mmaped_file(_):
 
 def view():
     """Get a dictionary representation of current metrics."""
-    assert initialized
     marshalled_metrics_mmap.seek(0)
     try:
         uwsgi.lock()
@@ -141,7 +116,6 @@ def timer(name):
         with timer('my_timer'):
             do_some_operation()
     """
-    assert initialized
     start_time = time.time()
     yield
     end_time = time.time()
@@ -166,7 +140,6 @@ def histogram(name, value):
         from uwsgi_metrics import histogram
         histogram('my_histogram', len(queue))
     """
-    assert initialized
     if not name in histograms:
         histograms[name] = Histogram()
     histograms[name].update(value)

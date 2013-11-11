@@ -13,11 +13,6 @@ class MetricsTest(T.TestCase):
         timer_view_sentinel = 17
         histogram_view_sentinel = 18
 
-        with mock.patch('os.getpid', return_value=42):
-            # Return value matches mocked-out uwsgi.masterpid(), as defined in
-            # uwsgi_metrics.metrics
-            uwsgi_metrics.initialize()
-
         with contextlib.nested(
             mock.patch('uwsgi_metrics.metrics.Timer', autospec=True),
             mock.patch('uwsgi_metrics.metrics.Histogram', autospec=True),
@@ -34,7 +29,7 @@ class MetricsTest(T.TestCase):
             # Any value will do here, just pick something
             uwsgi_metrics.histogram('bar', 27)
 
-        uwsgi_metrics.metrics.periodically_write_metrics_to_mmaped_file(None)
+        uwsgi_metrics.metrics.periodically_write_metrics_to_mmaped_buffer(None)
 
         expected_view = {
             'timers': {

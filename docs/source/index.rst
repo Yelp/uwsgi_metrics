@@ -57,8 +57,8 @@ There are a couple of steps required before you can use uwsgi_metrics:
 
 1. uWSGI must be started with a mule process;  this is done by passing the
    ``--mule`` option to the uWSGI executable.
-2. The :py:func:`uwsgi_metrics.initialize` method must be invoked in the master
-   process prior to forking.
+2. The ``uwsgi_metrics`` module must be loaded in the master process prior to
+   forking.
 
 How fast is uwsgi_metrics?
 ==========================
@@ -83,7 +83,7 @@ Assume that we're running with the following three types of uWSGI processes:
 Worker processes send metrics updates to the mule process e.g. using the
 :py:func:`uwsgi_metrics.timer` context manager.  The mule process aggregates
 these updates and periodically publishes them to an mmap'ed buffer using
-the ``periodically_write_metrics_to_mmaped_file()`` function. Worker
+the ``periodically_write_metrics_to_mmaped_buffer()`` function. Worker
 processes can view the aggregated metrics from the mmap'ed buffer using the
 :py:func:`uwsgi_metrics.view` function e.g. for publishing to an endpoint.
 
@@ -91,8 +91,6 @@ API
 ===
 
 .. currentmodule:: uwsgi_metrics
-
-.. autofunction:: initialize
 
 .. autofunction:: view
 
