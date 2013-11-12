@@ -1,10 +1,19 @@
-from distutils.core import setup
+#!/usr/bin/env python
+
+from setuptools import find_packages
+from setuptools import setup
 
 setup(
-    name='uWSGI Metrics',
+    name='uwsgi_metrics',
     version='0.1.0',
-    provides=['uwsgi_metrics'],
-    author='John Billings',
     description='Metrics for uWSGI services',
-    packages=['uwsgi_metrics'],
-    )
+    author='John Billings',
+    author_email='billings@yelp.com',
+    url='https://gitweb.yelpcorp.com/?p=uwsgi_metrics.git',
+    packages=find_packages(exclude=['tests']),
+    setup_requires=['setuptools'],
+    install_requires=[
+        'treap',
+    ],
+    license='Copyright Yelp 2013, All Rights Reserved'
+)
