@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='uwsgi_metrics',
-    version='0.1.0',
+    version='0.2.0',
     description='Metrics for uWSGI services',
     author='John Billings',
     author_email='billings@yelp.com',

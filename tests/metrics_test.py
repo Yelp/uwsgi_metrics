@@ -23,20 +23,22 @@ class MetricsTest(T.TestCase):
             mock_histogram_instance = mock_histogram.return_value
             mock_histogram_instance.view.return_value = histogram_view_sentinel
 
-            with uwsgi_metrics.timer('foo'):
+            with uwsgi_metrics.timing('foo'):
                 pass
 
-            # Any value will do here, just pick something
-            uwsgi_metrics.histogram('bar', 27)
+            # Any values will do here, just pick something
+            uwsgi_metrics.timer('bar', 39)
+            uwsgi_metrics.histogram('baz', 27)
 
         uwsgi_metrics.metrics.periodically_write_metrics_to_mmaped_buffer(None)
 
         expected_view = {
             'timers': {
                 'foo': timer_view_sentinel,
+                'bar': timer_view_sentinel,
                 },
             'histograms': {
-                'bar': histogram_view_sentinel,
+                'baz': histogram_view_sentinel,
                 }
             }
 

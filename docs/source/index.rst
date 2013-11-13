@@ -94,7 +94,9 @@ API
 
 .. autofunction:: view
 
-.. autofunction:: timer(name)
+.. autofunction:: timer
+
+.. autofunction:: timing(name)
 
 .. autofunction:: histogram
 

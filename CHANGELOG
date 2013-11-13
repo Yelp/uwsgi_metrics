@@ -1,0 +1,6 @@
+0.2.0 (2013-11-13)
+  * Rename 'timer' context manager to 'timing'
+  * Add 'timer' function which takes a timing delta
+
+0.1.0 (2013-11-12)
+  * Initial release

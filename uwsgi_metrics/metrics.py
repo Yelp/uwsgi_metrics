@@ -20,9 +20,6 @@ except ImportError:
         def unlock():
             pass
 
-        @staticmethod
-        def masterpid():
-            return 42
 
 try:
     import uwsgidecorators
@@ -108,24 +105,35 @@ def view():
 
 
 @contextlib.contextmanager
-def timer(name):
+def timing(name):
     """
     Context manager to time a section of code::
 
-        from uwsgi_metrics import timer
-        with timer('my_timer'):
+        from uwsgi_metrics import timing
+        with timing('my_timer'):
             do_some_operation()
     """
     start_time = time.time()
     yield
     end_time = time.time()
     delta = end_time - start_time
-    handle_timer(name, delta)
+    timer(name, delta)
 
 
 @uwsgidecorators.mulefunc(1)
-def handle_timer(name, delta):
-    # This asynchronously runs in the mule
+def timer(name, delta):
+    """
+    Record a timing delta:
+    ::
+
+        import time
+        from uwsgi_metrics import timer
+        before = time.time()
+        do_some_operation()
+        after = time.time()
+        delta = after - before
+        timer('my_timer', delta)
+    """
     if not name in timers:
         timers[name] = Timer()
     timers[name].update(delta)
