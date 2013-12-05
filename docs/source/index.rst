@@ -56,7 +56,7 @@ How do I use uwsgi_metrics?
 There are a couple of steps required before you can use uwsgi_metrics:
 
 1. uWSGI must be started with a mule process;  this is done by passing the
-   ``--mule`` option to the uWSGI executable.
+   ``--mule`` option_ to the uWSGI executable.
 2. The :py:func:`uwsgi_metrics.initialize` method must invoked in the master
    process prior to forking.
 
@@ -64,7 +64,7 @@ How fast is uwsgi_metrics?
 ==========================
 
 It takes approximately 30us to log a metric on a 2.3GHz Xeon E5.  The
-:py:func:`uwsgi_metrics.timer` context manager adds a further 20us, to give
+:py:func:`uwsgi_metrics.timing` context manager adds a further 20us, to give
 a total of approximately 50us.
 
 As a very rough guideline, you're probably not going to notice the overhead of
@@ -81,7 +81,7 @@ Assume that we're running with the following three types of uWSGI processes:
 * One or more worker processes
 
 Worker processes send metrics updates to the mule process e.g. using the
-:py:func:`uwsgi_metrics.timer` context manager.  The mule process aggregates
+:py:func:`uwsgi_metrics.timing` context manager.  The mule process aggregates
 these updates and periodically publishes them to an mmap'ed buffer using
 the ``periodically_write_metrics_to_mmaped_buffer()`` function. Worker
 processes can view the aggregated metrics from the mmap'ed buffer using the
@@ -105,3 +105,4 @@ API
 
 .. _Metrics: http://metrics.codahale.com/
 .. _uWSGI: http://uwsgi-docs.readthedocs.org/en/latest/
+.. _option: http://uwsgi-docs.readthedocs.org/en/latest/Options.html#mule
