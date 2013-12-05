@@ -20,6 +20,14 @@ except ImportError:
         def unlock():
             pass
 
+        @staticmethod
+        def add_timer(signal, period):
+            pass
+
+        @staticmethod
+        def register_signal(signal, target, func):
+            pass
+
 
 try:
     import uwsgidecorators
@@ -31,11 +39,6 @@ except ImportError:
                 return fun
             return decorator
 
-        @staticmethod
-        def timer(period, target):
-            def decorator(fun):
-                return fun
-            return decorator
 
 from uwsgi_metrics.histogram import Histogram
 from uwsgi_metrics.timer import Timer
@@ -43,6 +46,9 @@ from uwsgi_metrics.timer import Timer
 
 # Interval between updating marshalled metrics
 PROCESSING_PERIOD_S = 1
+
+# Signal number for periodic metrics writing
+PROCESSING_SIGNAL_NUM = 42
 
 # Maximum size of marshalled metrics
 MAX_MARSHALLED_VIEW_SIZE = 2**20
@@ -60,10 +66,28 @@ marshalled_metrics_mmap.write(
     marshal.dumps({
         'timers': {},
         'histograms': {}
-        }))
+    }))
+
+# Set when initialized() has been invoked
+initialized = False
 
 
-@uwsgidecorators.timer(PROCESSING_PERIOD_S, target='mule1')
+class NotInitialized(Exception):
+    """Raised when the initialize() method has not been invoked."""
+
+
+def initialize():
+    """Initialize metrics, must be invoked at least once prior to invoking any
+    other method."""
+    global initialized
+    if initialized:
+        return
+    initialized = True
+    uwsgi.add_timer(PROCESSING_SIGNAL_NUM, PROCESSING_PERIOD_S)
+    uwsgi.register_signal(PROCESSING_SIGNAL_NUM, 'mule1',
+                          periodically_write_metrics_to_mmaped_buffer)
+
+
 def periodically_write_metrics_to_mmaped_buffer(_):
     view = {
         'timers': {},
@@ -94,6 +118,8 @@ def periodically_write_metrics_to_mmaped_buffer(_):
 
 def view():
     """Get a dictionary representation of current metrics."""
+    if not initialized:
+        raise NotInitialized
     marshalled_metrics_mmap.seek(0)
     try:
         uwsgi.lock()

@@ -13,6 +13,8 @@ class MetricsTest(T.TestCase):
         timer_view_sentinel = 17
         histogram_view_sentinel = 18
 
+        uwsgi_metrics.initialize()
+
         with contextlib.nested(
             mock.patch('uwsgi_metrics.metrics.Timer', autospec=True),
             mock.patch('uwsgi_metrics.metrics.Histogram', autospec=True),
