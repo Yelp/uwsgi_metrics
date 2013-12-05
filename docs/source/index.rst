@@ -57,7 +57,7 @@ There are a couple of steps required before you can use uwsgi_metrics:
 
 1. uWSGI must be started with a mule process;  this is done by passing the
    ``--mule`` option to the uWSGI executable.
-2. The :py:func:``uwsgi_metrics.initialize`` method must invoked in the master
+2. The :py:func:`uwsgi_metrics.initialize` method must invoked in the master
    process prior to forking.
 
 How fast is uwsgi_metrics?
