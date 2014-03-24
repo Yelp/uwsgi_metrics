@@ -40,6 +40,7 @@ except ImportError:
             return decorator
 
 
+from uwsgi_metrics.counter import Counter
 from uwsgi_metrics.histogram import Histogram
 from uwsgi_metrics.timer import Timer
 
@@ -59,13 +60,15 @@ log = logging.getLogger('uwsgi_metrics.metrics')
 # memory mapped buffer for viewing by regular workers.
 timers = {}
 histograms = {}
+counters = {}
 
 # The memory mapped buffer
 marshalled_metrics_mmap = mmap.mmap(-1, MAX_MARSHALLED_VIEW_SIZE)
 marshalled_metrics_mmap.write(
     marshal.dumps({
         'timers': {},
-        'histograms': {}
+        'histograms': {},
+        'counters': {},
     }))
 
 # Set when initialized() has been invoked
@@ -91,12 +94,15 @@ def initialize():
 def periodically_write_metrics_to_mmaped_buffer(_):
     view = {
         'timers': {},
-        'histograms': {}
+        'histograms': {},
+        'counters': {}
         }
     for name, timer in timers.iteritems():
         view['timers'][name] = timer.view()
     for name, histogram in histograms.iteritems():
         view['histograms'][name] = histogram.view()
+    for name, counter in counters.iteritems():
+        view['counters'][name] = counter.view()
 
     marshalled_view = marshal.dumps(view)
     if len(marshalled_view) > MAX_MARSHALLED_VIEW_SIZE:
@@ -177,3 +183,24 @@ def histogram(name, value):
     if not name in histograms:
         histograms[name] = Histogram()
     histograms[name].update(value)
+
+
+@uwsgidecorators.mulefunc(1)
+def counter(name, number=1):
+    """
+    Record an event's occurence in a counter:
+    ::
+
+       from uwsgi_metrics import counter
+       counter('my_counter')
+       # my_counter -> 1
+       counter('my_counter', 1)
+       # my_counter -> 2
+       counter('my_counter', 4)
+       # my_counter -> 6
+       counter('my_counter', -2)
+       # my_counter -> 4
+    """
+    if not name in counters:
+        counters[name] = Counter()
+    counters[name].inc(number)

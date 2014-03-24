@@ -28,3 +28,8 @@ class CounterTest(T.TestCase):
     def test_decrements_by_an_arbitrary_delta(self):
         self.counter.dec(12)
         T.assert_equal(self.counter.get_count(), -12)
+
+    def test_view(self):
+        self.counter.inc(13)
+        T.assert_equal(self.counter.view(),
+                       {'count': 13})

@@ -18,3 +18,8 @@ class Counter(object):
     def get_count(self):
         """Get the counter's current value."""
         return self.count
+
+    def view(self):
+        return {
+            'count': self.get_count()
+        }
