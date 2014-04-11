@@ -166,7 +166,7 @@ def timer(name, delta):
         delta = after - before
         timer('my_timer', delta)
     """
-    if not name in timers:
+    if name not in timers:
         timers[name] = Timer()
     timers[name].update(delta)
 
@@ -180,7 +180,7 @@ def histogram(name, value):
         from uwsgi_metrics import histogram
         histogram('my_histogram', len(queue))
     """
-    if not name in histograms:
+    if name not in histograms:
         histograms[name] = Histogram()
     histograms[name].update(value)
 
@@ -201,6 +201,6 @@ def counter(name, number=1):
        counter('my_counter', -2)
        # my_counter -> 4
     """
-    if not name in counters:
+    if name not in counters:
         counters[name] = Counter()
     counters[name].inc(number)

@@ -1,3 +1,6 @@
+0.3.4 (2014-04-11)
+  * Fix pyflakes error
+
 0.3.3 (2014-03-24)
   * Addition of the counter function to the metrics.py module
 
