@@ -10,13 +10,14 @@ class Meter(object):
     Translated from Meter.java
     """
 
-    def __init__(self):
+    def __init__(self, event_type=None):
         self.m1_rate = EWMA.one_minute_EWMA()
         self.m5_rate = EWMA.five_minute_EWMA()
         self.m15_rate = EWMA.fifteen_minute_EWMA()
         self.count = 0
         self.start_time = time.time()
         self.last_tick = self.start_time
+        self.event_type = event_type
 
     def mark(self, n=1):
         """Mark the occurrence of a given number of events."""
@@ -58,11 +59,17 @@ class Meter(object):
             return 0.0
         return self.count / elapsed
 
-    def view(self):
-        return {
+    def view(self, ty=True):
+        result = {
             'm1': self.get_one_minute_rate(),
             'm5': self.get_five_minute_rate(),
             'm15': self.get_fifteen_minute_rate(),
             'mean': self.get_mean_rate(),
             'count': self.get_count(),
+            'unit': 'seconds',
             }
+        if self.event_type is not None:
+            result['event_type'] = self.event_type
+        if ty:
+            result['type'] = 'meter'
+        return result

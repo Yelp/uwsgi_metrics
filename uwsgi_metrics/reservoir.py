@@ -34,7 +34,8 @@ class Reservoir(object):
     Translated from ExponentiallyDecayingReservoir.java
     """
 
-    def __init__(self, size=DEFAULT_SIZE, alpha=DEFAULT_ALPHA):
+    def __init__(self, unit=None, size=DEFAULT_SIZE,
+                 alpha=DEFAULT_ALPHA):
         """Create a new exponentially-decaying random reservoir.
 
         :param size: the number of samples to keep in the sampling reservoir
@@ -42,6 +43,7 @@ class Reservoir(object):
             more biased the reservoir will be towards newer values.
         """
 
+        self.unit = unit
         self.size = size
         self.alpha = alpha
         self.start_time = self.current_time_in_fractional_seconds()
@@ -108,4 +110,4 @@ class Reservoir(object):
         self.values = new_values
 
     def get_snapshot(self):
-        return Snapshot(self.values.values())
+        return Snapshot(self.unit, self.values.values())

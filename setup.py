@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='uwsgi_metrics',
-    version='0.3.4',
+    version='1.0.0',
     description='Metrics for uWSGI services',
     author='John Billings',
     author_email='billings@yelp.com',
@@ -15,5 +15,5 @@ setup(
     install_requires=[
         'treap',
     ],
-    license='Copyright Yelp 2013, All Rights Reserved'
+    license='Copyright Yelp 2014, All Rights Reserved'
 )

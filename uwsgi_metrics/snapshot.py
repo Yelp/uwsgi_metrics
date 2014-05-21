@@ -7,7 +7,8 @@ class Snapshot(object):
     Translated from Snapshot.java
     """
 
-    def __init__(self, values=None):
+    def __init__(self, unit, values=None):
+        self.unit = unit
         if values is None:
             self.values = []
         else:
@@ -85,15 +86,18 @@ class Snapshot(object):
         return len(self.values)
 
     def view(self):
-        return {
+        result = {
             'min': self.get_min(),
             'max': self.get_max(),
             'mean': self.get_mean(),
-            'stddev': self.get_std_dev(),
-            'p50': self.get_median(),
+            'std_dev': self.get_std_dev(),
+            'median': self.get_median(),
             'p75': self.get_75th_percentile(),
             'p95': self.get_95th_percentile(),
             'p98': self.get_98th_percentile(),
             'p99': self.get_99th_percentile(),
-            'p99.9': self.get_999th_percentile(),
-            }
+            'p999': self.get_999th_percentile(),
+        }
+        if self.unit:
+            result['unit'] = self.unit
+        return result

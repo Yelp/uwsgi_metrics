@@ -1,38 +1,24 @@
-import testify as T
+"""Translated from EWMATest.java"""
+
 
 from uwsgi_metrics.ewma import EWMA
 
-MAX_DIFFERENCE = 0.00000001
 
+def assert_ewma(ewma, expected_rates):
+    max_difference = 0.00000001
 
-class EWMATest(T.TestCase):
-    """Translated from EWMATest.java"""
-
-    __test__ = False
-
-    ewma = None
-    expected_rates = None
-
-    def elapse_minute(self, ewma):
+    def elapse_minute(ewma):
         for i in xrange(12):
             ewma.tick()
 
-    def assert_almost_equal(self, lval, rval, max_difference):
-        T.assert_lte(abs(lval - rval), max_difference)
-
-    def test_ewma(self):
-        self.ewma.update(3)
-        self.ewma.tick()
-        for rate in self.expected_rates:
-            self.assert_almost_equal(
-                self.ewma.get_rate(), rate, MAX_DIFFERENCE)
-            self.elapse_minute(self.ewma)
+    ewma.update(3)
+    ewma.tick()
+    for rate in expected_rates:
+        assert abs(ewma.get_rate() - rate) < max_difference
+        elapse_minute(ewma)
 
 
-class OneMinuteEWMATest(EWMATest):
-
-    ewma = EWMA.one_minute_EWMA()
-
+def test_one_minute_EWMA():
     expected_rates = [
         0.6,
         0.22072766,
@@ -52,11 +38,11 @@ class OneMinuteEWMATest(EWMATest):
         0.00000018,
         ]
 
+    ewma = EWMA.one_minute_EWMA()
+    assert_ewma(ewma, expected_rates)
 
-class FiveMinuteEWMATest(EWMATest):
 
-    ewma = EWMA.five_minute_EWMA()
-
+def test_five_minute_EWMA():
     expected_rates = [
         0.6,
         0.49123845,
@@ -76,11 +62,11 @@ class FiveMinuteEWMATest(EWMATest):
         0.02987224
         ]
 
+    ewma = EWMA.five_minute_EWMA()
+    assert_ewma(ewma, expected_rates)
 
-class FifteenMinuteEWMATest(EWMATest):
 
-    ewma = EWMA.fifteen_minute_EWMA()
-
+def test_fifteen_minute_EWMA():
     expected_rates = [
         0.6,
         0.56130419,
@@ -99,3 +85,6 @@ class FifteenMinuteEWMATest(EWMATest):
         0.23594443,
         0.22072766,
         ]
+
+    ewma = EWMA.fifteen_minute_EWMA()
+    assert_ewma(ewma, expected_rates)

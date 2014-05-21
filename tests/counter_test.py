@@ -1,35 +1,39 @@
-import testify as T
+"""Translated from CounterTest.java"""
+
+import pytest
 
 from uwsgi_metrics.counter import Counter
 
 
-class CounterTest(T.TestCase):
-    """Translated from CounterTest.java"""
+@pytest.fixture
+def counter():
+    return Counter()
 
-    @T.setup
-    def create_counter(self):
-        self.counter = Counter()
 
-    def test_starts_at_zero(self):
-        T.assert_equal(self.counter.get_count(), 0)
+def test_starts_at_zero(counter):
+    assert counter.get_count() == 0
 
-    def test_increments_by_one(self):
-        self.counter.inc()
-        T.assert_equal(self.counter.get_count(), 1)
 
-    def test_increments_by_an_arbitrary_delta(self):
-        self.counter.inc(12)
-        T.assert_equal(self.counter.get_count(), 12)
+def test_increments_by_one(counter):
+    counter.inc()
+    assert counter.get_count() == 1
 
-    def test_decrements_by_one(self):
-        self.counter.dec()
-        T.assert_equal(self.counter.get_count(), -1)
 
-    def test_decrements_by_an_arbitrary_delta(self):
-        self.counter.dec(12)
-        T.assert_equal(self.counter.get_count(), -12)
+def test_increments_by_an_arbitrary_delta(counter):
+    counter.inc(12)
+    assert counter.get_count() == 12
 
-    def test_view(self):
-        self.counter.inc(13)
-        T.assert_equal(self.counter.view(),
-                       {'count': 13})
+
+def test_decrements_by_one(counter):
+    counter.dec()
+    assert counter.get_count() == -1
+
+
+def test_decrements_by_an_arbitrary_delta(counter):
+    counter.dec(12)
+    assert counter.get_count() == -12
+
+
+def test_view(counter):
+    counter.inc(13)
+    assert counter.view() == {'count': 13, 'type': 'counter'}

@@ -9,15 +9,17 @@ class Timer(object):
     Translated from Timer.java
     """
 
-    def __init__(self, meter=None, histogram=None):
-        self.meter = meter or Meter()
-        self.histogram = histogram or Histogram()
+    def __init__(self, unit):
+        self.meter = Meter()
+        self.histogram = Histogram(unit)
 
     def view(self):
-        return {
-            'duration': self.histogram.view(),
-            'throughput': self.meter.view(),
+        result = {
+            'duration': self.histogram.view(count=False, ty=False),
+            'rate': self.meter.view(ty=False),
+            'type': 'timer',
             }
+        return result
 
     def update(self, duration):
         """Add a recorded duration."""

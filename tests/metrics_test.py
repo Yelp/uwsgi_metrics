@@ -1,58 +1,156 @@
-import contextlib
-
 import mock
-import testify as T
+import pytest
 
 import uwsgi_metrics
+from uwsgi_metrics.metrics import emit
 
 
-class MetricsTest(T.TestCase):
+@pytest.fixture
+def setup():
+    uwsgi_metrics.metrics.reset()
+    uwsgi_metrics.initialize()
 
-    def test(self):
-        # mock.sentinel cannot be marshalled so let's roll our own
-        timer_view_sentinel = 17
-        histogram_view_sentinel = 18
-        counter_view_sentinel = 19
 
-        uwsgi_metrics.initialize()
+def test_timing(setup):
+    with mock.patch('time.time', return_value=42.0):
+        with uwsgi_metrics.timing(__name__, 'my_timer'):
+            pass
+        emit(None)
 
-        with contextlib.nested(
-            mock.patch('uwsgi_metrics.metrics.Timer', autospec=True),
-            mock.patch('uwsgi_metrics.metrics.Histogram', autospec=True),
-            mock.patch('uwsgi_metrics.metrics.Counter', autospec=True),
-                ) as (mock_timer, mock_histogram, mock_counter):
-            mock_timer_instance = mock_timer.return_value
-            mock_timer_instance.view.return_value = timer_view_sentinel
-
-            mock_histogram_instance = mock_histogram.return_value
-            mock_histogram_instance.view.return_value = histogram_view_sentinel
-
-            mock_counter_instance = mock_counter.return_value
-            mock_counter_instance.view.return_value = counter_view_sentinel
-
-            with uwsgi_metrics.timing('foo'):
-                pass
-
-            # Any values will do here, just pick something
-            uwsgi_metrics.timer('bar', 39)
-            uwsgi_metrics.histogram('baz', 27)
-            uwsgi_metrics.counter('qux')
-            uwsgi_metrics.counter('qux', 1)
-            uwsgi_metrics.counter('qux', -1)
-
-        uwsgi_metrics.metrics.periodically_write_metrics_to_mmaped_buffer(None)
-
-        expected_view = {
-            'timers': {
-                'foo': timer_view_sentinel,
-                'bar': timer_view_sentinel,
+    actual = uwsgi_metrics.view()
+    expected = {
+        'tests.metrics_test': {
+            'my_timer': {
+                'duration': {
+                    'p98': 0.0,
+                    'p99': 0.0,
+                    'p75': 0.0,
+                    'min': 0.0,
+                    'max': 0.0,
+                    'median': 0.0,
+                    'p95': 0.0,
+                    'std_dev': 0.0,
+                    'p999': 0.0,
+                    'unit': 'milliseconds',
+                    'mean': 0.0,
                 },
-            'histograms': {
-                'baz': histogram_view_sentinel,
+                'rate': {
+                    'count': 1,
+                    'm5': 0.0,
+                    'm15': 0.0,
+                    'm1': 0.0,
+                    'unit': 'seconds',
+                    'mean': 0.0,
                 },
-            'counters': {
-                'qux': counter_view_sentinel,
-                }
+                'type': 'timer',
             }
+        }
+    }
 
-        T.assert_dicts_equal(uwsgi_metrics.view(), expected_view)
+    assert expected == actual
+
+
+def test_timer(setup):
+    with mock.patch('time.time', return_value=42.0):
+        uwsgi_metrics.timer(__name__, 'my_timer', 0.0)
+        emit(None)
+
+    actual = uwsgi_metrics.view()
+    expected = {
+        'tests.metrics_test': {
+            'my_timer': {
+                'duration': {
+                    'p98': 0.0,
+                    'p99': 0.0,
+                    'p75': 0.0,
+                    'min': 0.0,
+                    'max': 0.0,
+                    'median': 0.0,
+                    'p95': 0.0,
+                    'std_dev': 0.0,
+                    'p999': 0.0,
+                    'unit': 'milliseconds',
+                    'mean': 0.0,
+                },
+                'rate': {
+                    'count': 1,
+                    'm5': 0.0,
+                    'm15': 0.0,
+                    'm1': 0.0,
+                    'unit': 'seconds',
+                    'mean': 0.0,
+                    },
+                'type': 'timer',
+            }
+        }
+    }
+
+    assert expected == actual
+
+
+def test_histogram(setup):
+    uwsgi_metrics.histogram(__name__, 'my_histogram', 42.0)
+    emit(None)
+
+    actual = uwsgi_metrics.view()
+    expected = {
+        'tests.metrics_test': {
+            'my_histogram': {
+                'max': 42.0,
+                'mean': 42.0,
+                'median': 42.0,
+                'min': 42.0,
+                'p75': 42.0,
+                'p95': 42.0,
+                'p98': 42.0,
+                'p99': 42.0,
+                'p999': 42.0,
+                'std_dev': 0.0,
+                'count': 1,
+                'type': 'histogram',
+            }
+        }
+    }
+
+    assert expected == actual
+
+
+def test_counter(setup):
+    uwsgi_metrics.counter(__name__, 'my_counter', 17.0)
+    emit(None)
+
+    actual = uwsgi_metrics.view()
+    expected = {
+        'tests.metrics_test': {
+            'my_counter': {
+                'count': 17.0,
+                'type': 'counter',
+            }
+        }
+    }
+
+    assert expected == actual
+
+
+def test_meter(setup):
+    with mock.patch('time.time', return_value=42.0):
+        uwsgi_metrics.meter(__name__, 'my_meter', 'my_event_type')
+        emit(None)
+
+    actual = uwsgi_metrics.view()
+    expected = {
+        'tests.metrics_test': {
+            'my_meter': {
+                'count': 1,
+                'm5': 0.0,
+                'm15': 0.0,
+                'm1': 0.0,
+                'mean': 0.0,
+                'event_type': 'my_event_type',
+                'type': 'meter',
+                'unit': 'seconds',
+            }
+        }
+    }
+
+    assert expected == actual

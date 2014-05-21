@@ -1,5 +1,6 @@
 # This is the uWSGI-specific part of uwsgi_metrics.
 
+import collections
 import contextlib
 import logging
 import marshal
@@ -42,34 +43,34 @@ except ImportError:
 
 from uwsgi_metrics.counter import Counter
 from uwsgi_metrics.histogram import Histogram
+from uwsgi_metrics.meter import Meter
 from uwsgi_metrics.timer import Timer
 
 
-# Interval between updating marshalled metrics
-PROCESSING_PERIOD_S = 1
+class MetricType(object):
 
-# Signal number for periodic metrics writing
-PROCESSING_SIGNAL_NUM = 42
+    COUNTER = 0
+    HISTOGRAM = 1
+    TIMER = 2
+    METER = 3
 
-# Maximum size of marshalled metrics
+
+DEFAULT_UPDATE_PERIOD_S = 5
+DEFAULT_TIMER_SIGNAL_NUMBER = 42
 MAX_MARSHALLED_VIEW_SIZE = 2**20
+MULE = 'mule1'
 
 log = logging.getLogger('uwsgi_metrics.metrics')
 
-# Dictionaries of metrics objects living in mule, periodically marshalled to
-# memory mapped buffer for viewing by regular workers.
-timers = {}
-histograms = {}
-counters = {}
+# Map of all metrics of type: module -> metric_name -> metric
+# where 'module' and 'metric_name' are both string values.
+# These metrics are periodically marshalled to the memory mapped buffer for
+# viewing by regular workers.
+all_metrics = collections.defaultdict(dict)
 
 # The memory mapped buffer
 marshalled_metrics_mmap = mmap.mmap(-1, MAX_MARSHALLED_VIEW_SIZE)
-marshalled_metrics_mmap.write(
-    marshal.dumps({
-        'timers': {},
-        'histograms': {},
-        'counters': {},
-    }))
+marshalled_metrics_mmap.write(marshal.dumps({}))
 
 # Set when initialized() has been invoked
 initialized = False
@@ -79,30 +80,35 @@ class NotInitialized(Exception):
     """Raised when the initialize() method has not been invoked."""
 
 
-def initialize():
+def initialize(signal_number=DEFAULT_TIMER_SIGNAL_NUMBER,
+               update_period_s=DEFAULT_UPDATE_PERIOD_S):
     """Initialize metrics, must be invoked at least once prior to invoking any
     other method."""
     global initialized
     if initialized:
         return
     initialized = True
-    uwsgi.add_timer(PROCESSING_SIGNAL_NUM, PROCESSING_PERIOD_S)
-    uwsgi.register_signal(PROCESSING_SIGNAL_NUM, 'mule1',
-                          periodically_write_metrics_to_mmaped_buffer)
+    uwsgi.add_timer(signal_number, update_period_s)
+    uwsgi.register_signal(signal_number, MULE, emit)
 
 
-def periodically_write_metrics_to_mmaped_buffer(_):
-    view = {
-        'timers': {},
-        'histograms': {},
-        'counters': {}
-        }
-    for name, timer in timers.iteritems():
-        view['timers'][name] = timer.view()
-    for name, histogram in histograms.iteritems():
-        view['histograms'][name] = histogram.view()
-    for name, counter in counters.iteritems():
-        view['counters'][name] = counter.view()
+def reset():
+    """Test-only method"""
+    global all_metrics, initialized
+    initialized = False
+    all_metrics = collections.defaultdict(dict)
+
+
+def emit(_):
+    """Serialize metrics to the memory mapped buffer."""
+    if not initialized:
+        raise NotInitialized
+
+    view = {}
+    for module, metrics_by_name in all_metrics.iteritems():
+        view[module] = {}
+        for name, (metric, _) in metrics_by_name.iteritems():
+            view[module][name] = metric.view()
 
     marshalled_view = marshal.dumps(view)
     if len(marshalled_view) > MAX_MARSHALLED_VIEW_SIZE:
@@ -126,6 +132,7 @@ def view():
     """Get a dictionary representation of current metrics."""
     if not initialized:
         raise NotInitialized
+
     marshalled_metrics_mmap.seek(0)
     try:
         uwsgi.lock()
@@ -137,70 +144,77 @@ def view():
 
 
 @contextlib.contextmanager
-def timing(name):
+def timing(module, name):
     """
     Context manager to time a section of code::
 
-        from uwsgi_metrics import timing
-        with timing('my_timer'):
+        with timing(__name__, 'my_timer'):
             do_some_operation()
     """
-    start_time = time.time()
+    start_time_s = time.time()
     yield
-    end_time = time.time()
-    delta = end_time - start_time
-    timer(name, delta)
+    end_time_s = time.time()
+    delta_s = end_time_s - start_time_s
+    delta_ms = delta_s * 1000
+    timer(module, name, delta_ms)
 
 
 @uwsgidecorators.mulefunc(1)
-def timer(name, delta):
+def timer(module, name, delta, unit='milliseconds'):
     """
     Record a timing delta:
     ::
 
-        import time
-        from uwsgi_metrics import timer
-        before = time.time()
+        start_time_s = time.time()
         do_some_operation()
-        after = time.time()
-        delta = after - before
-        timer('my_timer', delta)
+        end_time_s = time.time()
+        delta_s = end_time_s - start_time_s
+        delta_ms = delta_s * 1000
+        timer(__name__, 'my_timer', delta_ms)
     """
-    if name not in timers:
-        timers[name] = Timer()
-    timers[name].update(delta)
+    timer, ty = all_metrics[module].setdefault(
+        name, (Timer(unit=unit), MetricType.TIMER))
+    assert ty == MetricType.TIMER
+    timer.update(delta)
 
 
 @uwsgidecorators.mulefunc(1)
-def histogram(name, value):
+def histogram(module, name, value, unit=None):
     """
     Record a value in a histogram:
     ::
 
-        from uwsgi_metrics import histogram
-        histogram('my_histogram', len(queue))
+        histogram(__name__, 'my_histogram', len(queue))
     """
-    if name not in histograms:
-        histograms[name] = Histogram()
-    histograms[name].update(value)
+    histogram, ty = all_metrics[module].setdefault(
+        name, (Histogram(unit), MetricType.HISTOGRAM))
+    assert ty == MetricType.HISTOGRAM
+    histogram.update(value)
 
 
 @uwsgidecorators.mulefunc(1)
-def counter(name, number=1):
+def counter(module, name, count=1):
     """
     Record an event's occurence in a counter:
     ::
 
-       from uwsgi_metrics import counter
-       counter('my_counter')
-       # my_counter -> 1
-       counter('my_counter', 1)
-       # my_counter -> 2
-       counter('my_counter', 4)
-       # my_counter -> 6
-       counter('my_counter', -2)
-       # my_counter -> 4
+       counter(__name__, 'my_counter')
     """
-    if name not in counters:
-        counters[name] = Counter()
-    counters[name].inc(number)
+    counter, ty = all_metrics[module].setdefault(
+        name, (Counter(), MetricType.COUNTER))
+    assert ty == MetricType.COUNTER
+    counter.inc(count)
+
+
+@uwsgidecorators.mulefunc(1)
+def meter(module, name, event_type=None, count=1):
+    """
+    Record an event rate:
+    ::
+
+       meter(__name__, 'my_meter', 'event_type')
+    """
+    meter, ty = all_metrics[module].setdefault(
+        name, (Meter(event_type), MetricType.METER))
+    assert ty == MetricType.METER
+    meter.mark(count)

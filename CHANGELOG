@@ -1,3 +1,8 @@
+1.0.0 (2014-05-20)
+  * Match output of Java Metrics 2.2.0
+  * Add meter function
+  * Switch over to pytest from testify
+
 0.3.4 (2014-04-11)
   * Fix pyflakes error
 
