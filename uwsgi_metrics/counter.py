@@ -22,5 +22,4 @@ class Counter(object):
     def view(self):
         return {
             'count': self.get_count(),
-            'type': 'counter',
         }

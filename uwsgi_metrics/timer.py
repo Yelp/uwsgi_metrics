@@ -9,15 +9,31 @@ class Timer(object):
     Translated from Timer.java
     """
 
-    def __init__(self, unit):
+    def __init__(self, duration_units):
         self.meter = Meter()
-        self.histogram = Histogram(unit)
+        self.histogram = Histogram()
+        self.duration_units = duration_units
 
     def view(self):
+        snapshot = self.get_snapshot()
         result = {
-            'duration': self.histogram.view(count=False, ty=False),
-            'rate': self.meter.view(ty=False),
-            'type': 'timer',
+            'count': self.meter.get_count(),
+            'max': snapshot.get_max(),
+            'mean': snapshot.get_mean(),
+            'min': snapshot.get_min(),
+            'p50': snapshot.get_median(),
+            'p75': snapshot.get_75th_percentile(),
+            'p95': snapshot.get_95th_percentile(),
+            'p98': snapshot.get_98th_percentile(),
+            'p99': snapshot.get_99th_percentile(),
+            'p999': snapshot.get_999th_percentile(),
+            'stddev': snapshot.get_std_dev(),
+            'm15_rate': self.meter.get_fifteen_minute_rate(),
+            'm1_rate': self.meter.get_one_minute_rate(),
+            'm5_rate': self.meter.get_five_minute_rate(),
+            'mean_rate': self.meter.get_mean_rate(),
+            'duration_units': self.duration_units,
+            'rate_units': 'calls/second'
             }
         return result
 

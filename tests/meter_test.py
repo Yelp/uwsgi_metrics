@@ -54,12 +54,11 @@ def test_marks_events_and_updates_rates_and_count(meter_and_clock):
 def test_view(meter_and_clock):
     meter = meter_and_clock[0]
     expected = {
-        'm1': 0.0,
-        'm5': 0.0,
-        'm15': 0.0,
-        'mean': 0.0,
         'count': 0,
-        'unit': 'seconds',
-        'type': 'meter',
+        'm15_rate': 0.0,
+        'm1_rate': 0.0,
+        'm5_rate': 0.0,
+        'mean_rate': 0.0,
+        'units': 'events/second',
     }
     assert meter.view() == expected

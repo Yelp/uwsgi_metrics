@@ -11,7 +11,7 @@ from uwsgi_metrics.snapshot import Snapshot
 @pytest.fixture
 def histogram():
     reservoir = mock.create_autospec(Reservoir)
-    histogram = Histogram(unit='seconds')
+    histogram = Histogram()
     histogram.reservoir = reservoir
     return histogram
 
@@ -39,6 +39,5 @@ def test_view(histogram):
     expected = {
         'foo': 42,
         'count': 0,
-        'type': 'histogram'
     }
     assert histogram.view() == expected

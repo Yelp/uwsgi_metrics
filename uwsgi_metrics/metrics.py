@@ -1,6 +1,5 @@
 # This is the uWSGI-specific part of uwsgi_metrics.
 
-import collections
 import contextlib
 import logging
 import marshal
@@ -41,19 +40,11 @@ except ImportError:
             return decorator
 
 
+from uwsgi_metrics.__about__ import __version__
 from uwsgi_metrics.counter import Counter
 from uwsgi_metrics.histogram import Histogram
 from uwsgi_metrics.meter import Meter
 from uwsgi_metrics.timer import Timer
-
-
-class MetricType(object):
-
-    COUNTER = 0
-    HISTOGRAM = 1
-    TIMER = 2
-    METER = 3
-
 
 DEFAULT_UPDATE_PERIOD_S = 5
 DEFAULT_TIMER_SIGNAL_NUMBER = 42
@@ -62,11 +53,11 @@ MULE = 'mule1'
 
 log = logging.getLogger('uwsgi_metrics.metrics')
 
-# Map of all metrics of type: module -> metric_name -> metric
+# Map of all metrics of type: metric_type -> module -> metric_name -> metric
 # where 'module' and 'metric_name' are both string values.
 # These metrics are periodically marshalled to the memory mapped buffer for
 # viewing by regular workers.
-all_metrics = collections.defaultdict(dict)
+all_metrics = {}
 
 # The memory mapped buffer
 marshalled_metrics_mmap = mmap.mmap(-1, MAX_MARSHALLED_VIEW_SIZE)
@@ -78,6 +69,11 @@ initialized = False
 
 class NotInitialized(Exception):
     """Raised when the initialize() method has not been invoked."""
+
+
+def get_metric(ty, module, name, default):
+    key = (ty, module, name)
+    return all_metrics.setdefault(key, default)
 
 
 def initialize(signal_number=DEFAULT_TIMER_SIGNAL_NUMBER,
@@ -96,7 +92,7 @@ def reset():
     """Test-only method"""
     global all_metrics, initialized
     initialized = False
-    all_metrics = collections.defaultdict(dict)
+    all_metrics = {}
 
 
 def emit(_):
@@ -104,11 +100,17 @@ def emit(_):
     if not initialized:
         raise NotInitialized
 
-    view = {}
-    for module, metrics_by_name in all_metrics.iteritems():
-        view[module] = {}
-        for name, (metric, _) in metrics_by_name.iteritems():
-            view[module][name] = metric.view()
+    view = {
+        'version': __version__,
+        'counters': {},
+        'gauges': {},
+        'histograms': {},
+        'meters': {},
+        'timers': {},
+    }
+
+    for (ty, module, name), metric in all_metrics.iteritems():
+        view[ty]['%s.%s' % (module, name)] = metric.view()
 
     marshalled_view = marshal.dumps(view)
     if len(marshalled_view) > MAX_MARSHALLED_VIEW_SIZE:
@@ -160,7 +162,7 @@ def timing(module, name):
 
 
 @uwsgidecorators.mulefunc(1)
-def timer(module, name, delta, unit='milliseconds'):
+def timer(module, name, delta, duration_units='milliseconds'):
     """
     Record a timing delta:
     ::
@@ -172,23 +174,19 @@ def timer(module, name, delta, unit='milliseconds'):
         delta_ms = delta_s * 1000
         timer(__name__, 'my_timer', delta_ms)
     """
-    timer, ty = all_metrics[module].setdefault(
-        name, (Timer(unit=unit), MetricType.TIMER))
-    assert ty == MetricType.TIMER
+    timer = get_metric('timers', module, name, Timer(duration_units))
     timer.update(delta)
 
 
 @uwsgidecorators.mulefunc(1)
-def histogram(module, name, value, unit=None):
+def histogram(module, name, value):
     """
     Record a value in a histogram:
     ::
 
         histogram(__name__, 'my_histogram', len(queue))
     """
-    histogram, ty = all_metrics[module].setdefault(
-        name, (Histogram(unit), MetricType.HISTOGRAM))
-    assert ty == MetricType.HISTOGRAM
+    histogram = get_metric('histograms', module, name, Histogram())
     histogram.update(value)
 
 
@@ -200,21 +198,17 @@ def counter(module, name, count=1):
 
        counter(__name__, 'my_counter')
     """
-    counter, ty = all_metrics[module].setdefault(
-        name, (Counter(), MetricType.COUNTER))
-    assert ty == MetricType.COUNTER
+    counter = get_metric('counters', module, name, Counter())
     counter.inc(count)
 
 
 @uwsgidecorators.mulefunc(1)
-def meter(module, name, event_type=None, count=1):
+def meter(module, name, count=1):
     """
     Record an event rate:
     ::
 
        meter(__name__, 'my_meter', 'event_type')
     """
-    meter, ty = all_metrics[module].setdefault(
-        name, (Meter(event_type), MetricType.METER))
-    assert ty == MetricType.METER
+    meter = get_metric('meters', module, name, Meter())
     meter.mark(count)

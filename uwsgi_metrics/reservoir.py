@@ -110,4 +110,4 @@ class Reservoir(object):
         self.values = new_values
 
     def get_snapshot(self):
-        return Snapshot(self.unit, self.values.values())
+        return Snapshot(self.values.values())

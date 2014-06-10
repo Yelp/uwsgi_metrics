@@ -1,19 +1,28 @@
-#!/usr/bin/env python
+from __future__ import absolute_import, division, print_function
 
-from setuptools import find_packages
-from setuptools import setup
+import os
+
+from setuptools import find_packages, setup
+
+base_dir = os.path.dirname(__file__)
+
+about = {}
+with open(os.path.join(base_dir, "uwsgi_metrics", "__about__.py")) as f:
+    exec(f.read(), about)
 
 setup(
-    name='uwsgi_metrics',
-    version='1.0.0',
-    description='Metrics for uWSGI services',
-    author='John Billings',
-    author_email='billings@yelp.com',
-    url='https://gitweb.yelpcorp.com/?p=uwsgi_metrics.git',
-    packages=find_packages(exclude=['tests']),
-    setup_requires=['setuptools'],
+    name=about['__title__'],
+    version=about['__version__'],
+
+    description=about['__summary__'],
+
+    url=about['__uri__'],
+
+    author=about['__author__'],
+    author_email=about['__email__'],
+    packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
         'treap',
     ],
-    license='Copyright Yelp 2014, All Rights Reserved'
+    license=about['__license__']
 )

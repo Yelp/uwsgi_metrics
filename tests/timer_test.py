@@ -67,11 +67,43 @@ def test_update_ignores_negative_values(timer):
 
 
 def test_view(timer):
-    timer.histogram.view.return_value = mock.sentinel.histogram_view
-    timer.meter.view.return_value = mock.sentinel.meter_view
+    timer.meter.get_count.return_value = mock.sentinel.count
+    timer.meter.get_fifteen_minute_rate.return_value = mock.sentinel.m15_rate
+    timer.meter.get_one_minute_rate.return_value = mock.sentinel.m1_rate
+    timer.meter.get_five_minute_rate.return_value = mock.sentinel.m5_rate
+    timer.meter.get_mean_rate.return_value = mock.sentinel.mean_rate
+
+    mock_snapshot = mock.Mock()
+    mock_snapshot.get_max.return_value = mock.sentinel.max
+    mock_snapshot.get_mean.return_value = mock.sentinel.mean
+    mock_snapshot.get_min.return_value = mock.sentinel.min
+    mock_snapshot.get_median.return_value = mock.sentinel.median
+    mock_snapshot.get_75th_percentile.return_value = mock.sentinel.p75
+    mock_snapshot.get_95th_percentile.return_value = mock.sentinel.p95
+    mock_snapshot.get_98th_percentile.return_value = mock.sentinel.p98
+    mock_snapshot.get_99th_percentile.return_value = mock.sentinel.p99
+    mock_snapshot.get_999th_percentile.return_value = mock.sentinel.p999
+    mock_snapshot.get_std_dev.return_value = mock.sentinel.stddev
+    timer.histogram.get_snapshot.return_value = mock_snapshot
+
     expected = {
-        'duration': mock.sentinel.histogram_view,
-        'rate': mock.sentinel.meter_view,
-        'type': 'timer',
+        'count': mock.sentinel.count,
+        'max': mock.sentinel.max,
+        'mean': mock.sentinel.mean,
+        'min': mock.sentinel.min,
+        'p50': mock.sentinel.median,
+        'p75': mock.sentinel.p75,
+        'p95': mock.sentinel.p95,
+        'p98': mock.sentinel.p98,
+        'p99': mock.sentinel.p99,
+        'p999': mock.sentinel.p999,
+        'stddev': mock.sentinel.stddev,
+        'm15_rate': mock.sentinel.m15_rate,
+        'm1_rate': mock.sentinel.m1_rate,
+        'm5_rate': mock.sentinel.m5_rate,
+        'mean_rate': mock.sentinel.mean_rate,
+        'duration_units': 'seconds',
+        'rate_units': 'calls/second'
     }
+
     assert timer.view() == expected

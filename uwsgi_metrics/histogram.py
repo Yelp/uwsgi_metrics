@@ -7,9 +7,9 @@ class Histogram(object):
     Translated from Histogram.java
     """
 
-    def __init__(self, unit):
+    def __init__(self):
         self.count = 0
-        self.reservoir = Reservoir(unit)
+        self.reservoir = Reservoir()
 
     def update(self, value):
         self.count += 1
@@ -21,10 +21,7 @@ class Histogram(object):
     def get_snapshot(self):
         return self.reservoir.get_snapshot()
 
-    def view(self, count=True, ty=True):
+    def view(self):
         result = self.get_snapshot().view()
-        if count:
-            result['count'] = self.get_count()
-        if ty:
-            result['type'] = 'histogram'
+        result['count'] = self.get_count()
         return result

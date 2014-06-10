@@ -36,4 +36,4 @@ def test_decrements_by_an_arbitrary_delta(counter):
 
 def test_view(counter):
     counter.inc(13)
-    assert counter.view() == {'count': 13, 'type': 'counter'}
+    assert counter.view() == {'count': 13}
