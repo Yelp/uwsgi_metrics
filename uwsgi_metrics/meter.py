@@ -61,9 +61,9 @@ class Meter(object):
     def view(self):
         result = {
             'count': self.get_count(),
-            'm15_rate': self.get_one_minute_rate(),
-            'm1_rate': self.get_five_minute_rate(),
-            'm5_rate': self.get_fifteen_minute_rate(),
+            'm15_rate': self.get_fifteen_minute_rate(),
+            'm1_rate': self.get_one_minute_rate(),
+            'm5_rate': self.get_five_minute_rate(),
             'mean_rate': self.get_mean_rate(),
             'units': 'events/second',
             }
