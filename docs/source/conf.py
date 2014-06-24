@@ -66,7 +66,7 @@ copyright = u'Yelp Inc'
 # built documents.
 #
 
-base_dir = os.path.join(os.path.dirname(__file__), os.pardir)
+base_dir = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir)
 about = {}
 with open(os.path.join(base_dir, "uwsgi_metrics", "__about__.py")) as f:
     exec(f.read(), about)
