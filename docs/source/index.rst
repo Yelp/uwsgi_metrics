@@ -19,31 +19,32 @@ gather application-level metrics::
 You can then invoke the :py:func:`uwsgi_metrics.view` function to get a
 dictionary of metrics information::
 
+
         {
-          "my_module_name": {
-            "my_timer": {
-              "type": "timer",
-              "duration": {
-                "p98": 1.4624929428100582,
-                "p99": 1.6739368438720703,
-                "p75": 0.4450678825378418,
-                "p999": 1.6739368438720703,
-                "min": 0.25391578674316406,
-                "max": 1.6739368438720703,
-                "p95": 0.92144012451171652,
-                "std_dev": 0.21753626933399898,
-                "mean": 0.45870650898326528,
-                "median": 0.40006637573242188,
-                "unit": "milliseconds"
-              },
-              "rate": {
-                "m5": 2.0715749688040106e-53,
-                "m1": 2.2285181292345502e-264,
-                "m15": 3.6957346986808987e-18,
-                "count": 88,
-                "mean": 0.0024034510262515092,
-                "unit": "seconds"
-              }
+          "version": "1.1.1",
+          "counters": {},
+          "gauges": {},
+          "histograms": {},
+          "meters": {},
+          "timers": {
+            "my_module.my_timer": {
+              "count": 22,
+              "p98": 4.8198699951171875,
+              "m15_rate": 1.0033118138834103,
+              "p75": 1.9915103912353516,
+              "p99": 4.8198699951171875,
+              "min": 1.4159679412841797,
+              "max": 4.8198699951171875,
+              "m5_rate": 1.0098078505715211,
+              "p95": 4.7961950302124023,
+              "m1_rate": 1.0454161929696191,
+              "duration_units": "milliseconds",
+              "stddev": 0.92399302814991413,
+              "mean_rate": 1.2074971885928811,
+              "rate_units": "calls/second",
+              "p999": 4.8198699951171875,
+              "p50": 1.649022102355957,
+              "mean": 1.9796761599454014
             }
           }
         }

@@ -53,11 +53,18 @@ MULE = 'mule1'
 
 log = logging.getLogger('uwsgi_metrics.metrics')
 
-# Map of all metrics of type: metric_type -> module -> metric_name -> metric
+# Map of all metrics of type: metric_type -> module.metric_name -> metric
 # where 'module' and 'metric_name' are both string values.
 # These metrics are periodically marshalled to the memory mapped buffer for
 # viewing by regular workers.
-all_metrics = {}
+all_metrics = {
+    'version': __version__,
+    'counters': {},
+    'gauges': {},
+    'histograms': {},
+    'meters': {},
+    'timers': {},
+}
 
 # The memory mapped buffer
 marshalled_metrics_mmap = mmap.mmap(-1, MAX_MARSHALLED_VIEW_SIZE)
