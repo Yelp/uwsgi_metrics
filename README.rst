@@ -7,7 +7,7 @@ Overview
 --------
 
 uwsgi_metrics is a port of Coda Hale's Metrics_ package to the uWSGI_ stack.
-It allows you to use functions such as :py:func:`uwsgi_metrics.timing` to
+It allows you to use functions such as ``uwsgi_metrics.timing`` to
 gather application-level metrics:
 
 .. code:: Python
@@ -15,9 +15,8 @@ gather application-level metrics:
         with timing(__name__, 'my_timer'):
             do_some_operation()
 
-You can then invoke the :py:func:`uwsgi_metrics.view` function to get a
-dictionary of metrics information::
-
+You can then invoke the ``uwsgi_metrics.view`` function to get a
+dictionary of metrics information:
 
 .. code:: JSON
 
@@ -50,7 +49,7 @@ dictionary of metrics information::
           }
         }
 
-You can wire up :py:func:`uwsgi_metrics.view` to an HTTP endpoint so that you can
+You can wire up ``uwsgi_metrics.view`` to an HTTP endpoint so that you can
 interactively monitor the performance of your production code.
 
 Setup
@@ -60,7 +59,7 @@ There are a couple of steps required before you can use uwsgi_metrics:
 
 1. uWSGI must be started with a mule process;  this is done by passing the
    ``--mule`` option_ to the uWSGI executable.
-2. The :py:func:`uwsgi_metrics.initialize` method must invoked in the master
+2. The ``uwsgi_metrics.initialize`` method must invoked in the master
    process prior to forking.
 
 Performance
