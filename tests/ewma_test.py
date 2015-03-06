@@ -36,7 +36,7 @@ def test_one_minute_EWMA():
         0.00000136,
         0.00000050,
         0.00000018,
-        ]
+    ]
 
     ewma = EWMA.one_minute_EWMA()
     assert_ewma(ewma, expected_rates)
@@ -60,7 +60,7 @@ def test_five_minute_EWMA():
         0.04456415,
         0.03648604,
         0.02987224
-        ]
+    ]
 
     ewma = EWMA.five_minute_EWMA()
     assert_ewma(ewma, expected_rates)
@@ -84,7 +84,7 @@ def test_fifteen_minute_EWMA():
         0.25221023,
         0.23594443,
         0.22072766,
-        ]
+    ]
 
     ewma = EWMA.fifteen_minute_EWMA()
     assert_ewma(ewma, expected_rates)

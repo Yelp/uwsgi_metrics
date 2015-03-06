@@ -34,7 +34,7 @@ class Timer(object):
             'mean_rate': self.meter.get_mean_rate(),
             'duration_units': self.duration_units,
             'rate_units': 'calls/second'
-            }
+        }
         return result
 
     def update(self, duration):

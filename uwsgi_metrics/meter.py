@@ -66,5 +66,5 @@ class Meter(object):
             'm5_rate': self.get_five_minute_rate(),
             'mean_rate': self.get_mean_rate(),
             'units': 'events/second',
-            }
+        }
         return result
