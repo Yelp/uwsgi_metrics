@@ -4,7 +4,12 @@ import math
 import random
 import time
 
-import treap
+try:
+    import treap
+except ImportError:
+    # treap using cython, which means that it cannot be installed on
+    # readthedocs.  Catch the error here so that we can continue building docs.
+    pass
 
 from uwsgi_metrics.snapshot import Snapshot
 
