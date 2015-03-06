@@ -1,20 +1,10 @@
 language: python
 
-env:
-  - TOX_ENV=py
-
 before_install:
   - sudo apt-get install -qq cython
 
 install:
-  - pip install tox coveralls
+  - pip install tox
 
 script:
   - make test
-
-after_success:
-  - tox -e cover
-  - coveralls
-
-virtualenv:
-  system_site_packages: true
