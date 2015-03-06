@@ -9,7 +9,7 @@ uwsgi_metrics
 Overview
 ========
 
-uwsgi_metrics is a port of Coda Hale's Metrics_ package to the uWSGI_ stack.
+uwsgi_metrics is a port of the Dropwizard Metrics_ package to the uWSGI_ stack.
 It allows you to use functions such as :py:func:`uwsgi_metrics.timing` to
 gather application-level metrics::
 
@@ -92,8 +92,16 @@ API
 
 .. autofunction:: timing(module, name)
 
+License
+-------
 
+Copyright (c) 2010-2015 Coda Hale, Yammer.com
 
-.. _Metrics: http://metrics.codahale.com/
+Copyright (c) 2015, Yelp, Inc.
+
+Published under Apache Software License 2.0, see LICENSE_.
+
+.. _Metrics: http://dropwizard.github.io/metrics/
 .. _uWSGI: http://uwsgi-docs.readthedocs.org/en/latest/
 .. _option: http://uwsgi-docs.readthedocs.org/en/latest/Options.html#mule
+.. _LICENSE: https://github.com/Yelp/uwsgi_metrics/blob/master/LICENSE

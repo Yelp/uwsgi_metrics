@@ -5,11 +5,11 @@ __all__ = [
 
 __title__ = "uwsgi_metrics"
 __summary__ = "Metrics for uWSGI services"
-__uri__ = "https://gitweb.yelpcorp.com/?p=uwsgi_metrics.git"
+__uri__ = "https://github.com/Yelp/uwsgi_metrics"
 
 __version__ = "1.1.4"
 
 __author__ = "John Billings"
 __email__ = "billings@yelp.com"
 
-__license__ = "Copyright Yelp 2014, All Rights Reserved"
+__license__ = "Apache Software License 2.0"
