@@ -16,7 +16,7 @@ License
 
 Copyright (c) 2010-2015 Coda Hale, Yammer.com
 
-Copyright (c) 2015, Yelp, Inc.
+Copyright (c) 2015 Yelp, Inc.
 
 Published under Apache Software License 2.0, see LICENSE_.
 
