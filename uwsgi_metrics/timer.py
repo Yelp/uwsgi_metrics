@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from uwsgi_metrics.meter import Meter
 from uwsgi_metrics.histogram import Histogram
 
@@ -34,7 +38,7 @@ class Timer(object):
             'mean_rate': self.meter.get_mean_rate(),
             'duration_units': self.duration_units,
             'rate_units': 'calls/second'
-            }
+        }
         return result
 
     def update(self, duration):

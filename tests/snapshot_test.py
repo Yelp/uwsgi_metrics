@@ -1,5 +1,7 @@
 """Translated from SnapshotTest.java"""
-
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import random
 
@@ -86,7 +88,7 @@ def test_calculates_a_std_dev_of_zero_for_a_singelton_snapshot():
 
 
 def test_all_percentiles_in_more_detail():
-    values = range(0, 1000)
+    values = list(range(0, 1000))
     random.shuffle(values)
     snapshot = Snapshot(values)
 

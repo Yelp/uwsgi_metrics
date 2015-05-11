@@ -1,6 +1,12 @@
 """Translated from ExponentiallyDecayingReservoirTest.java"""
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import mock
+try:
+    from unittest import mock
+except:
+    import mock
 
 from uwsgi_metrics.reservoir import Reservoir
 
@@ -12,7 +18,7 @@ def assert_all_values_between(reservoir, low, high):
 
 def test_insert_1000_elements_into_a_reservoir_of_100():
     reservoir = Reservoir('unit', size=100, alpha=0.99)
-    for i in xrange(1000):
+    for i in range(1000):
         reservoir.update(i)
 
     assert reservoir.get_snapshot().size() == 100
@@ -21,7 +27,7 @@ def test_insert_1000_elements_into_a_reservoir_of_100():
 
 def test_insert_10_elements_into_a_reservoir_of_100():
     reservoir = Reservoir('unit', size=100, alpha=0.99)
-    for i in xrange(10):
+    for i in range(10):
         reservoir.update(i)
 
     assert reservoir.get_snapshot().size() == 10
@@ -30,7 +36,7 @@ def test_insert_10_elements_into_a_reservoir_of_100():
 
 def test_insert_100_elemnts_into_a_heavily_baised_reservoir_of_1000():
     reservoir = Reservoir('unit', size=1000, alpha=0.01)
-    for i in xrange(100):
+    for i in range(100):
         reservoir.update(i)
 
     assert reservoir.get_snapshot().size() == 100
@@ -58,7 +64,7 @@ def test_inactivity_should_not_corrupt_sampling_state():
         reservoir = Reservoir('unit', size=10, alpha=0.015)
 
         # Add 1000 values at a rate of 10 values/second
-        for i in xrange(1000):
+        for i in range(1000):
             reservoir.update(1000 + i)
             clock.add_millis(100)
 

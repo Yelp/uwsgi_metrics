@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 """Translated from EWMATest.java"""
-
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 from uwsgi_metrics.ewma import EWMA
 
@@ -8,7 +10,7 @@ def assert_ewma(ewma, expected_rates):
     max_difference = 0.00000001
 
     def elapse_minute(ewma):
-        for i in xrange(12):
+        for i in range(12):
             ewma.tick()
 
     ewma.update(3)
@@ -36,7 +38,7 @@ def test_one_minute_EWMA():
         0.00000136,
         0.00000050,
         0.00000018,
-        ]
+    ]
 
     ewma = EWMA.one_minute_EWMA()
     assert_ewma(ewma, expected_rates)
@@ -60,7 +62,7 @@ def test_five_minute_EWMA():
         0.04456415,
         0.03648604,
         0.02987224
-        ]
+    ]
 
     ewma = EWMA.five_minute_EWMA()
     assert_ewma(ewma, expected_rates)
@@ -84,7 +86,7 @@ def test_fifteen_minute_EWMA():
         0.25221023,
         0.23594443,
         0.22072766,
-        ]
+    ]
 
     ewma = EWMA.fifteen_minute_EWMA()
     assert_ewma(ewma, expected_rates)
