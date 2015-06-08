@@ -158,19 +158,31 @@ def view():
 
 
 @contextlib.contextmanager
-def timing(module, name):
+def timing(module, name, handle=False):
     """
     Context manager to time a section of code::
 
         with timing(__name__, 'my_timer'):
             do_some_operation()
+
+    If handle is set to True, then this will log results even when
+    the caller raises exceptions (which is not the default behavior).
     """
+    raise_exception = False
     start_time_s = time.time()
-    yield
+    if handle:
+        try:
+            yield
+        except:
+            raise_exception = True
+    else:
+        yield
     end_time_s = time.time()
     delta_s = end_time_s - start_time_s
     delta_ms = delta_s * 1000
     timer(module, name, delta_ms)
+    if raise_exception:
+        raise
 
 
 @uwsgidecorators.mulefunc(1)
