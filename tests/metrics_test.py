@@ -61,7 +61,7 @@ def test_timing(setup):
 def test_timing_handling(setup):
     with mock.patch('time.time', return_value=42.0):
         with pytest.raises(Exception) as excinfo:
-            with uwsgi_metrics.timing(__name__, 'exc_timer', handle=True):
+            with uwsgi_metrics.timing(__name__, 'exc_timer'):
                 raise Exception('testing exception handling')
         emit(None)
     assert 'testing exception handling' == str(excinfo.value)

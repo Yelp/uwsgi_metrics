@@ -7,7 +7,7 @@ __title__ = "uwsgi_metrics"
 __summary__ = "Metrics for uWSGI services"
 __uri__ = "https://gitweb.yelpcorp.com/?p=uwsgi_metrics.git"
 
-__version__ = "1.2.0"
+__version__ = "1.1.6"
 
 __author__ = "John Billings"
 __email__ = "billings@yelp.com"
