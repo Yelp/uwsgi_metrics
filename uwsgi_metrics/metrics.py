@@ -164,9 +164,6 @@ def timing(module, name):
 
         with timing(__name__, 'my_timer'):
             do_some_operation()
-
-    If handle is set to True, then this will log results even when
-    the caller raises exceptions (which is not the default behavior).
     """
     start_time_s = time.time()
     try:
