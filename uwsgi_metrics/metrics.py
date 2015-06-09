@@ -166,11 +166,13 @@ def timing(module, name):
             do_some_operation()
     """
     start_time_s = time.time()
-    yield
-    end_time_s = time.time()
-    delta_s = end_time_s - start_time_s
-    delta_ms = delta_s * 1000
-    timer(module, name, delta_ms)
+    try:
+        yield
+    finally:
+        end_time_s = time.time()
+        delta_s = end_time_s - start_time_s
+        delta_ms = delta_s * 1000
+        timer(module, name, delta_ms)
 
 
 @uwsgidecorators.mulefunc(1)

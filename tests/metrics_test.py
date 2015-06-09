@@ -58,6 +58,47 @@ def test_timing(setup):
     assert expected == actual
 
 
+def test_timing_handling(setup):
+    with mock.patch('time.time', return_value=42.0):
+        with pytest.raises(Exception) as excinfo:
+            with uwsgi_metrics.timing(__name__, 'exc_timer'):
+                raise Exception('testing exception handling')
+        emit(None)
+    assert 'testing exception handling' == str(excinfo.value)
+
+    actual = uwsgi_metrics.view()
+    expected = {
+        'version': __version__,
+        'counters': {},
+        'gauges': {},
+        'histograms': {},
+        'meters': {},
+        'timers': {
+            'tests.metrics_test.exc_timer': {
+                'count': 1,
+                'max': 0.0,
+                'mean': 0.0,
+                'min': 0.0,
+                'p50': 0.0,
+                'p75': 0.0,
+                'p95': 0.0,
+                'p98': 0.0,
+                'p99': 0.0,
+                'p999': 0.0,
+                'stddev': 0.0,
+                'm15_rate': 0.0,
+                'm1_rate': 0.0,
+                'm5_rate': 0.0,
+                'mean_rate': 0.0,
+                'duration_units': 'milliseconds',
+                'rate_units': 'calls/second',
+            }
+        }
+    }
+
+    assert expected == actual
+
+
 def test_timer(setup):
     with mock.patch('time.time', return_value=42.0):
         uwsgi_metrics.timer(__name__, 'my_timer', 0.0)
