@@ -58,8 +58,8 @@ def test_inactivity_should_not_corrupt_sampling_state():
         def add_hours(self, hours):
             self._time += 60 * 60 * hours
 
-    with mock.patch('uwsgi_metrics.reservoir.Reservoir'
-                    + '.current_time_in_fractional_seconds',
+    with mock.patch(('uwsgi_metrics.reservoir.Reservoir'
+                     '.current_time_in_fractional_seconds'),
                     Clock(42.0)) as clock:
         reservoir = Reservoir('unit', size=10, alpha=0.015)
 
