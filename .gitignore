@@ -2,3 +2,4 @@
 .tox
 __pycache__
 uwsgi_metrics.egg-info
+.coverage

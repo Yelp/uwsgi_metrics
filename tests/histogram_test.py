@@ -1,6 +1,12 @@
+# -*- coding: utf-8 -*-
 """Translated from HistogramTest.java"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import mock
+try:
+    from unittest import mock
+except:
+    import mock
 import pytest
 
 from uwsgi_metrics.histogram import Histogram

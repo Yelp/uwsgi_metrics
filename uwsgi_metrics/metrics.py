@@ -1,10 +1,15 @@
+# -*- coding: utf-8 -*-
 # This is the uWSGI-specific part of uwsgi_metrics.
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
 import contextlib
 import logging
 import marshal
 import mmap
 import time
+
+import six
 
 try:
     import uwsgi
@@ -48,7 +53,7 @@ from uwsgi_metrics.timer import Timer
 
 DEFAULT_UPDATE_PERIOD_S = 5
 DEFAULT_TIMER_SIGNAL_NUMBER = 42
-MAX_MARSHALLED_VIEW_SIZE = 2**20
+MAX_MARSHALLED_VIEW_SIZE = 2 ** 20
 MULE = 'mule1'
 
 log = logging.getLogger('uwsgi_metrics.metrics')
@@ -116,7 +121,7 @@ def emit(_):
         'timers': {},
     }
 
-    for (ty, module, name), metric in all_metrics.iteritems():
+    for (ty, module, name), metric in six.iteritems(all_metrics):
         view[ty]['%s.%s' % (module, name)] = metric.view()
 
     marshalled_view = marshal.dumps(view)
@@ -161,11 +166,13 @@ def timing(module, name):
             do_some_operation()
     """
     start_time_s = time.time()
-    yield
-    end_time_s = time.time()
-    delta_s = end_time_s - start_time_s
-    delta_ms = delta_s * 1000
-    timer(module, name, delta_ms)
+    try:
+        yield
+    finally:
+        end_time_s = time.time()
+        delta_s = end_time_s - start_time_s
+        delta_ms = delta_s * 1000
+        timer(module, name, delta_ms)
 
 
 @uwsgidecorators.mulefunc(1)

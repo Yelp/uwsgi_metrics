@@ -22,6 +22,7 @@ setup(
     author_email=about['__email__'],
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=[
+        'six',
         'treap',
     ],
     license=about['__license__']
