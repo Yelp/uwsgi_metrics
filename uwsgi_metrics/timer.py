@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
 from uwsgi_metrics.meter import Meter
 from uwsgi_metrics.histogram import Histogram
 

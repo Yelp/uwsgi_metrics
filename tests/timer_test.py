@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
 """Translated from TimerTest.java"""
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-
-import mock
+try:
+    from unittest import mock
+except:
+    import mock
 import pytest
 
 from uwsgi_metrics.histogram import Histogram
@@ -49,9 +54,9 @@ def test_get_fifteen_minute_rate(timer):
 
 
 def test_update_modifies_histogram_and_meter(timer):
-    timer.update(mock.sentinel.timer_update_value)
-    timer.histogram.update.assert_called_once_with(
-        mock.sentinel.timer_update_value)
+    UPDATE_VALUE = 5
+    timer.update(UPDATE_VALUE)
+    timer.histogram.update.assert_called_once_with(UPDATE_VALUE)
     timer.meter.mark.assert_called_once_with()
 
 

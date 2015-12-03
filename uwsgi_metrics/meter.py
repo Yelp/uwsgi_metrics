@@ -1,6 +1,17 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import sys
 import time
 
-from ewma import EWMA
+from uwsgi_metrics.ewma import EWMA
+
+
+if sys.version_info[0] == 3:
+    range_ = range
+else:
+    range_ = xrange  # noqa
 
 
 class Meter(object):
@@ -32,7 +43,7 @@ class Meter(object):
         if age > EWMA.TICK_INTERVAL_S:
             self.last_tick = new_tick - age % EWMA.TICK_INTERVAL_S
             required_ticks = int(age / EWMA.TICK_INTERVAL_S)
-            for _ in xrange(required_ticks):
+            for _ in range_(required_ticks):
                 self.m1_rate.tick()
                 self.m5_rate.tick()
                 self.m15_rate.tick()
